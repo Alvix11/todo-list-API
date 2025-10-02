@@ -8,3 +8,8 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+    
+class Task(models.Model):
+    
+    title = models.CharField(max_length=100)
+    description = models.TextField()
