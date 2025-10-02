@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from todos.models import User
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class UserRegisterSerializer(serializers.ModelSerializer):
     
     password = serializers.CharField(write_only=True)
     
