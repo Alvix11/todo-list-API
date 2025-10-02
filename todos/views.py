@@ -25,10 +25,14 @@ class UserRegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UserLoginView(APIView):
+    
     authentication_classes = []
     permission_classes = []
     
     def post(self, request):
+        """
+        Handles POST request for user login
+        """
         
         serializer = UserLoginSerializer(data=request.data)
         
@@ -38,7 +42,8 @@ class UserLoginView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                             'token': str(refresh.access_token)
-                            }, status=status.HTTP_200_OK
+                            }, 
+                            status=status.HTTP_200_OK
                             )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
