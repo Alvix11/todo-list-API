@@ -8,7 +8,9 @@ from .serializers import UserRegistrationSerializer
 class UserRegistrationView(APIView):
     
     def post(self, request):
-        
+        """
+        Handles POST request for user registration
+        """
         serializer = UserRegistrationSerializer(data=request.data)
         
         if serializer.is_valid():
