@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from todos.models import User
+from todos.models import User, Task
 from django.contrib.auth import authenticate
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -37,3 +37,9 @@ class UserLoginSerializer(serializers.Serializer):
         
         data['user'] = user
         return data
+    
+class TaskSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Task
+        fields = ['title', 'description']
