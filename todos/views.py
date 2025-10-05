@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsTaskOwner
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from .pagination import CustomPagination
 from .models import Task
 
 # Create your views here.
@@ -127,3 +128,23 @@ class TaskDetailView(APIView):
             {"message": "Success"},
             status=status.HTTP_204_NO_CONTENT
             )
+
+class TaskListView(APIView):
+    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+    
+    def get(self, request):
+        """
+        Handles GET for get task for user
+        """
+        tasks = Task.objects.filter(user=request.user)
+        
+        paginator = self.pagination_class()
+        
+        result_page = paginator.paginate_queryset(tasks, request)
+        
+        serializer = TaskSerializer(result_page, many=True)
+        
+        return paginator.get_paginated_response(serializer.data)
