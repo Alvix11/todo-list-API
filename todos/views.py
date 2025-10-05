@@ -50,7 +50,7 @@ class UserLoginView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class CreateTaskView(APIView):
+class TaskCreateView(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -70,7 +70,7 @@ class CreateTaskView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateTaskView(APIView):
+class TaskDetailView(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -94,3 +94,22 @@ class UpdateTaskView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        """
+        Handles DELETE for delete task
+        """
+        
+        task = get_task(pk, request.user)
+        
+        if task is None:
+            return Response(
+                {"message": "Forbidden"},
+                status=status.HTTP_403_FORBIDDEN
+                )
+        
+        task.delete()
+        return Response(
+            {"message": "Success"},
+            status=status.HTTP_204_NO_CONTENT
+            )
