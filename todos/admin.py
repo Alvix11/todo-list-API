@@ -9,6 +9,7 @@ class CustomUserAdmin(UserAdmin):
 
 class CustomTask(admin.ModelAdmin):
     list_display = ['title', 'user', 'id']
+    readonly_fields = ['id']
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Task, CustomTask)
