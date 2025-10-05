@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,7 +6,7 @@ from .serializers import UserRegisterSerializer, UserLoginSerializer, TaskSerial
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Task
+from .utils import get_task
 
 # Create your views here.
 class UserRegisterView(APIView):
@@ -36,7 +36,6 @@ class UserLoginView(APIView):
         """
         Handles POST request for user login
         """
-        
         serializer = UserLoginSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -60,7 +59,6 @@ class CreateTaskView(APIView):
         """
         Handles POST for request create task
         """
-        
         data = request.data.copy()
         data['user'] = request.user.id
         
@@ -81,11 +79,13 @@ class UpdateTaskView(APIView):
         """
         Handles POST for update task
         """
-        
-        task = get_object_or_404(Task, pk=pk, user=request.user)
+        task = get_task(pk, request.user)
         
         if task is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "Forbidden"},
+                status=status.HTTP_403_FORBIDDEN
+                )
         
         serializer = TaskSerializer(task, data=request.data)
         
