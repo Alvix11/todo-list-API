@@ -5,8 +5,9 @@ from rest_framework import status
 from .serializers import UserRegisterSerializer, UserLoginSerializer, TaskSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsTaskOwner
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils import get_task_user
+from .models import Task
 
 # Create your views here.
 class UserRegisterView(APIView):
@@ -71,20 +72,26 @@ class TaskCreateView(APIView):
 class TaskDetailView(APIView):
     
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTaskOwner]
+    
+    def get_object(self, pk):
+        """
+        Obtain task and verify permissions
+        """
+        try:
+            task = Task.objects.get(pk=pk)
+            self.check_object_permissions(self.request, task)
+            return task
+        except Task.DoesNotExist:
+            return None
     
     def put(self, request, pk):
         """
         Handles POST for update task
         """
-        task = get_task_user(pk, request.user)
+        task = self.get_object(pk=pk)
         
-        if task == 403:
-            return Response(
-                {"message": "Forbidden"},
-                status=status.HTTP_403_FORBIDDEN
-                )
-        elif task == 404:
+        if task is None:
             return Response(
                 {"message": "Not Found"},
                 status=status.HTTP_404_NOT_FOUND
@@ -103,15 +110,9 @@ class TaskDetailView(APIView):
         Handles DELETE for delete task
         """
         
-        task = get_task_user(pk, request.user)
+        task = self.get_object(pk=pk)
         
-        if task == 403:
-            return Response(
-                {"message": "Forbidden"},
-                status=status.HTTP_403_FORBIDDEN
-                )
-
-        elif task == 404:
+        if task is None:
             return Response(
                 {"message": "Not Found"},
                 status=status.HTTP_404_NOT_FOUND
