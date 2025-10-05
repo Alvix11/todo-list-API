@@ -6,7 +6,7 @@ from .serializers import UserRegisterSerializer, UserLoginSerializer, TaskSerial
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .utils import get_task
+from .utils import get_task_user
 
 # Create your views here.
 class UserRegisterView(APIView):
@@ -59,13 +59,11 @@ class TaskCreateView(APIView):
         """
         Handles POST for request create task
         """
-        data = request.data.copy()
-        data['user'] = request.user.id
         
-        serializer = TaskSerializer(data=data)
+        serializer = TaskSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -79,12 +77,17 @@ class TaskDetailView(APIView):
         """
         Handles POST for update task
         """
-        task = get_task(pk, request.user)
+        task = get_task_user(pk, request.user)
         
-        if task is None:
+        if task == 403:
             return Response(
                 {"message": "Forbidden"},
                 status=status.HTTP_403_FORBIDDEN
+                )
+        elif task == 404:
+            return Response(
+                {"message": "Not Found"},
+                status=status.HTTP_404_NOT_FOUND
                 )
         
         serializer = TaskSerializer(task, data=request.data)
@@ -100,12 +103,18 @@ class TaskDetailView(APIView):
         Handles DELETE for delete task
         """
         
-        task = get_task(pk, request.user)
+        task = get_task_user(pk, request.user)
         
-        if task is None:
+        if task == 403:
             return Response(
                 {"message": "Forbidden"},
                 status=status.HTTP_403_FORBIDDEN
+                )
+
+        elif task == 404:
+            return Response(
+                {"message": "Not Found"},
+                status=status.HTTP_404_NOT_FOUND
                 )
         
         task.delete()
