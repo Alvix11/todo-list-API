@@ -8,7 +8,7 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ['email', 'username']
 
 class CustomTask(admin.ModelAdmin):
-    list_display = ['title', 'user']
+    list_display = ['title', 'user', 'id']
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Task, CustomTask)
