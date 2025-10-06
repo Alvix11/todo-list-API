@@ -4,7 +4,7 @@ from todos.models import User, Task
 
 # Register your models here.
 class CustomUserAdmin(UserAdmin):
-    list_display = ['email', 'username', 'is_staff', 'is_active']
+    list_display = ['email', 'username', 'is_staff', 'is_active', 'id']
     search_fields = ['email', 'username']
 
 class CustomTask(admin.ModelAdmin):
