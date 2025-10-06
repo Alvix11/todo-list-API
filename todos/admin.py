@@ -8,12 +8,17 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ['email', 'username']
 
 class CustomTask(admin.ModelAdmin):
-    readonly_fields = [ 'id']
-    list_display = ['id', 'title', 'get_user_id', 'get_user_username']
+    readonly_fields = [ 'get_task_id', 'user', 'get_user_id']
+    list_display = ['get_task_id', 'title', 'get_user_id', 'get_user_username']
     list_filter = ['user']
     
     def get_user_id(self, obj):
         return obj.user.id
+    
+    def get_task_id(self, obj):
+        return obj.id
+    
+    get_task_id.short_description = 'Task ID'
     
     get_user_id.short_description = 'User ID'
     get_user_id.admin_order_field = 'user__id'
