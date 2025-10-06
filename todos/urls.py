@@ -5,6 +5,6 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('todos/', TaskCreateView.as_view(), name='create'),
-    path('todos/<int:pk>/', TaskDetailView.as_view(), name='update'), 
+    path('todos/<int:pk>/', TaskDetailView.as_view(), name='detail'), 
     path('todos', TaskListView.as_view(), name='list')
 ]
