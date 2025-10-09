@@ -178,34 +178,33 @@ class TaskListView(APIView):
         # Access the query params
         search = request.query_params.get('search')
         username = request.query_params.get('username')
+        all_of = request.query_params.get('allof')
         
-        if search:
+        if all_of and all_of.lower() == 'true':
+            tasks = Task.objects.all()
+        else:
+            tasks = Task.objects.filter(user=request.user)
+
+        if username and search:
+            tasks = Task.objects.filter(
+                (Q(title__icontains=search) |
+                Q(description__icontains=search)) & Q(user__username=username)
+            )
+        
+        elif search:
             
             tasks = Task.objects.filter(
                 Q(title__icontains=search) |
                 Q(description__icontains=search)
                 )
-            
-            paginator = self.pagination_class()
-            result_page = paginator.paginate_queryset(tasks, request)
-            serializer = TaskSerializer(result_page, many=True)
-            
-            return paginator.get_paginated_response(serializer.data)
         
         elif username:
             
             tasks = Task.objects.filter(
                 Q(user__username=username)
                 )
-            
-            paginator = self.pagination_class()
-            result_page = paginator.paginate_queryset(tasks, request)
-            serializer = TaskSerializer(result_page, many=True)
-            
-            return paginator.get_paginated_response(serializer.data)
-
-
-        tasks = Task.objects.all().order_by('id')
+        
+        tasks = tasks.order_by('id')
         
         paginator = self.pagination_class()
         result_page = paginator.paginate_queryset(tasks, request)
