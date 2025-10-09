@@ -9,6 +9,7 @@ from .permissions import IsTaskOwner
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .pagination import CustomPagination
 from .models import Task
+from django.db.models import Q
 
 # Create your views here.
 class UserRegisterView(APIView):
@@ -174,12 +175,40 @@ class TaskListView(APIView):
         """
         Handles GET for get task for user
         """
+        # Access the query params
+        search = request.query_params.get('search')
+        username = request.query_params.get('username')
+        
+        if search:
+            
+            tasks = Task.objects.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search)
+                )
+            
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(tasks, request)
+            serializer = TaskSerializer(result_page, many=True)
+            
+            return paginator.get_paginated_response(serializer.data)
+        
+        elif username:
+            
+            tasks = Task.objects.filter(
+                Q(user__username=username)
+                )
+            
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(tasks, request)
+            serializer = TaskSerializer(result_page, many=True)
+            
+            return paginator.get_paginated_response(serializer.data)
+
+
         tasks = Task.objects.all().order_by('id')
         
         paginator = self.pagination_class()
-        
         result_page = paginator.paginate_queryset(tasks, request)
-        
         serializer = TaskSerializer(result_page, many=True)
         
         return paginator.get_paginated_response(serializer.data)
