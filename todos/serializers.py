@@ -39,7 +39,8 @@ class UserLoginSerializer(serializers.Serializer):
         return data
     
 class TaskSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
     
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description']
+        fields = ['id', 'title', 'description', 'username']
