@@ -94,12 +94,7 @@ class TaskDetailView(APIView):
         """
         Handles GET for show task
         """
-        
-        try:
-            # Avoid 'get_object' - it requires permissions. Doing direct DB lookup instead
-            task = Task.objects.get(pk=pk)
-        except Task.DoesNotExist:
-            task = None
+        task = self.get_object(pk=pk)
 
         if task is None:
             return Response(
