@@ -89,7 +89,27 @@ class TaskDetailView(APIView):
             return task
         except Task.DoesNotExist:
             return None
-    
+        
+    def get(self, request, pk):
+        """
+        Handles GET for show task
+        """
+        
+        try:
+            # Avoid 'get_object' - it requires permissions. Doing direct DB lookup instead
+            task = Task.objects.get(pk=pk)
+        except Task.DoesNotExist:
+            task = None
+
+        if task is None:
+            return Response(
+                {"message": "Not Found"},
+                status=status.HTTP_404_NOT_FOUND
+                )
+        
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
     def put(self, request, pk):
         """
         Handles POST for update task
