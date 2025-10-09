@@ -139,7 +139,7 @@ class TaskListView(APIView):
         """
         Handles GET for get task for user
         """
-        tasks = Task.objects.filter(user=request.user)
+        tasks = Task.objects.all().order_by('id')
         
         paginator = self.pagination_class()
         
