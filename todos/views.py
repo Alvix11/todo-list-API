@@ -17,6 +17,8 @@ class UserRegisterView(APIView):
     
     authentication_classes = []
     permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth'
     
     def post(self, request):
         """
@@ -39,6 +41,8 @@ class UserLoginView(APIView):
     
     authentication_classes = []
     permission_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth'
     
     def post(self, request):
         """
@@ -62,6 +66,8 @@ class TaskCreateView(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'burst'
     
     def post(self, request):
         """
@@ -80,6 +86,8 @@ class TaskDetailView(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsTaskOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'burst'
     
     def get_object(self, pk):
         """
