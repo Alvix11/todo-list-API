@@ -6,11 +6,12 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.throttling import UserRateThrottle, ScopedRateThrottle
 from .serializers import UserRegisterSerializer, UserLoginSerializer, TaskSerializer
 from .permissions import IsTaskOwner
 from .pagination import CustomPagination
+from .utils import get_object
 from .models import Task
-from rest_framework.throttling import UserRateThrottle, ScopedRateThrottle
 
 # Create your views here.
 class UserRegisterView(APIView):
@@ -88,23 +89,12 @@ class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated, IsTaskOwner]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'burst'
-    
-    def get_object(self, pk):
-        """
-        Obtain task and verify permissions
-        """
-        try:
-            task = Task.objects.get(pk=pk)
-            self.check_object_permissions(self.request, task)
-            return task
-        except Task.DoesNotExist:
-            return None
         
     def get(self, request, pk):
         """
         Handles GET for show task
         """
-        task = self.get_object(pk=pk)
+        task = get_object(self, pk=pk)
 
         if task is None:
             return Response(
@@ -119,7 +109,7 @@ class TaskDetailView(APIView):
         """
         Handles POST for update task
         """
-        task = self.get_object(pk=pk)
+        task = get_object(self, pk=pk)
         
         if task is None:
             return Response(
@@ -139,7 +129,7 @@ class TaskDetailView(APIView):
         """
         Handles PATCH for update task
         """
-        task = self.get_object(pk=pk)
+        task = get_object(self, pk=pk)
         
         if task is None:
             return Response(
@@ -160,7 +150,7 @@ class TaskDetailView(APIView):
         Handles DELETE for delete task
         """
         
-        task = self.get_object(pk=pk)
+        task = get_object(self, pk=pk)
         
         if task is None:
             return Response(
