@@ -188,21 +188,21 @@ class TaskListView(APIView):
             tasks = Task.objects.filter(user=request.user)
 
         if username and search:
-            tasks = Task.objects.filter(
+            tasks = tasks.filter(
                 (Q(title__icontains=search) |
                 Q(description__icontains=search)) & Q(user__username=username)
             )
         
         elif search:
             
-            tasks = Task.objects.filter(
+            tasks = tasks.filter(
                 Q(title__icontains=search) |
                 Q(description__icontains=search)
                 )
         
         elif username:
             
-            tasks = Task.objects.filter(
+            tasks = tasks.filter(
                 Q(user__username=username)
                 )
         
