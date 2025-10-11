@@ -10,6 +10,7 @@ from .serializers import UserRegisterSerializer, UserLoginSerializer, TaskSerial
 from .permissions import IsTaskOwner
 from .pagination import CustomPagination
 from .models import Task
+from rest_framework.throttling import UserRateThrottle, ScopedRateThrottle
 
 # Create your views here.
 class UserRegisterView(APIView):
@@ -169,6 +170,7 @@ class TaskListView(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    throttle_classes = [UserRateThrottle]
     pagination_class = CustomPagination
     
     def get(self, request):
