@@ -125,6 +125,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLES_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLES_RATES': {
+        'anon': '100/hours',
+        'user': '5000/day',
+        'burst': '200/minute',
+        'auth': '10/minute'
+    },
     'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
 }
 
