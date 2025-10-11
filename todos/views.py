@@ -82,29 +82,14 @@ class TaskCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class TaskDetailView(APIView):
+    
+class TaskUpdateView(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsTaskOwner]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'burst'
-        
-    def get(self, request, pk):
-        """
-        Handles GET for show task
-        """
-        task = get_object(self, pk=pk)
-
-        if task is None:
-            return Response(
-                {"message": "Not Found"},
-                status=status.HTTP_404_NOT_FOUND
-                )
-        
-        serializer = TaskSerializer(task)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-        
+    
     def put(self, request, pk):
         """
         Handles POST for update task
@@ -144,6 +129,13 @@ class TaskDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TaskDeleteView(APIView):
+    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsTaskOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'burst'
     
     def delete(self, request, pk):
         """
@@ -163,6 +155,27 @@ class TaskDetailView(APIView):
             {"message": "Success"},
             status=status.HTTP_204_NO_CONTENT
             )
+
+class TaskDetailView(APIView):
+    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [UserRateThrottle]
+    
+    def get(self, request, pk):
+        """
+        Handles GET for show task
+        """
+        task = get_object(self, pk=pk)
+
+        if task is None:
+            return Response(
+                {"message": "Not Found"},
+                status=status.HTTP_404_NOT_FOUND
+                )
+        
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class TaskListView(APIView):
     
